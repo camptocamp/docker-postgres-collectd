@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec 2>&1
+exec /confd/confd --backend rancher --prefix /2015-12-19
