@@ -1,0 +1,8 @@
+[template]
+src = "20postgresql-replication.conf.tmpl"
+dest = "/etc/collectd/collectd.conf.d/20postgresql-replication.conf.conf"
+keys = [
+  "/self/stack/services/postgres/containers",
+]
+
+reload_cmd = "/usr/bin/sv force-reload collectd"
