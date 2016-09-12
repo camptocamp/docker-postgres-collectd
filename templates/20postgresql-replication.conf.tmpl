@@ -1,6 +1,7 @@
 <Plugin "postgresql">
 {{range ls "/self/stack/services/postgres/containers"}}
   <Database template1>
+    Instance "{{.}}"
     Host "{{.}}"
     Port "5432"
     User "postgres"
