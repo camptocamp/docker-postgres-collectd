@@ -1,12 +1,18 @@
 <Plugin "postgresql">
-{{range ls "/self/stack/services/postgres/containers"}}
+{{ $containers := getvs "/containers/*/name" -}}
+{{ range $containers -}}
+  {{ $contname := . -}}
+  {{ $label := printf "/containers/%s/labels/com.camptocamp.monitoring.postgres" $contname -}}
+  {{ $monitor := getv $label "false" -}}
+  {{ if eq $monitor "true" }}
   <Database template1>
-    Instance "{{.}}"
-    Host "{{.}}"
+    Instance "{{ $contname }}"
+    Host "{{ $contname }}"
     Port "5432"
     User "postgres"
     Query replication_lag
     Query xlog_position
   </Database>
-{{end}}
+  {{   end -}}
+{{ end }}
 </Plugin>
