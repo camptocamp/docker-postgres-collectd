@@ -3,6 +3,7 @@ src = "20postgresql-replication.conf.tmpl"
 dest = "/etc/collectd/collectd.conf.d/20postgresql-replication.conf"
 keys = [
   "/containers",
+  "/stacks",
 ]
 
 reload_cmd = "/usr/bin/sv force-reload collectd"

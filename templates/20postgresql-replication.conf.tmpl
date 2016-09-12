@@ -13,6 +13,30 @@
     Query replication_lag
     Query xlog_position
   </Database>
-  {{   end -}}
+  {{ end -}}
+{{ end -}}
+
+{{ range $stack := lsdir "/stacks" -}}
+  {{ $services := printf "/stacks/%s/services" $stack -}}
+  {{ range $service := lsdir $services -}}
+  {{ $kind := printf "/stacks/%s/services/%s/kind" $stack $service -}}
+  {{ $_kind := getv $kind -}}
+  {{ if eq $_kind "externalService" -}}
+    {{ $label := printf "/stacks/%s/services/%s/labels/com.camptocamp.monitoring.postgres" $stack $service -}}
+    {{ $monitor := getv $label "false" -}}
+    {{ if eq $monitor "true" }}
+      {{ $hostname := printf "/stacks/%s/services/%s/hostname" $stack $service }}
+  <Database template1>
+    Instance "{{ getv $hostname }}"
+    Host "{{ getv $hostname }}"
+    Port "5432"
+    User "postgres"
+    Query replication_lag
+    Query xlog_position
+  </Database>
+      {{ end -}}
+    {{ end -}}
+  {{ end -}}
 {{ end }}
+
 </Plugin>
