@@ -26,11 +26,14 @@
     {{ $monitor := getv $label "false" -}}
     {{ if eq $monitor "true" }}
       {{ $hostname := printf "/stacks/%s/services/%s/hostname" $stack $service }}
+      {{ $user := printf "/stacks/%s/services/%s/metadata/credentials/user" $stack $service }}
+      {{ $password := printf "/stacks/%s/services/%s/metadata/credentials/password" $stack $service }}
   <Database template1>
     Instance "{{ getv $hostname }}"
     Host "{{ getv $hostname }}"
     Port "5432"
-    User "postgres"
+    User "{{ getv $user }}"
+    Password "{{ getv $password }}"
     Query replication_lag
     Query xlog_position
   </Database>
