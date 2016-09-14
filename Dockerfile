@@ -1,12 +1,8 @@
-FROM camptocamp/collectd:0.1.1
+FROM camptocamp/collectd:0.1.2
 
 RUN apt-get update \
  && apt-get -y upgrade \
  && apt-get -y --no-install-suggests --no-install-recommends install \
-    libcurl3-gnutls \
-    libgcrypt20 \
-    libriemann-client0 \
-    libudev1 \
     libpq5 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
