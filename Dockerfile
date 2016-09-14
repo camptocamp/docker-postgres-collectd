@@ -4,6 +4,7 @@ RUN apt-get update \
  && apt-get -y upgrade \
  && apt-get -y --no-install-suggests --no-install-recommends install \
     libpq5 \
+    postgresql-client \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
