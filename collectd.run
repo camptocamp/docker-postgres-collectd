@@ -8,4 +8,5 @@ while true; do
   sleep 1
 done
 
+sh /create-20postgresql-replication.conf.sh
 exec /usr/sbin/collectd -f
