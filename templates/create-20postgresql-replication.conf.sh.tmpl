@@ -26,7 +26,7 @@ echo "SELECT datname FROM pg_database WHERE datistemplate = false;" | psql -h {{
 
 cat <<EOF >> $OUTPUT
   <Database $database>
-    Instance "{{ $contname }}"
+    Instance "{{ $contname }}_$database"
     Host "{{ $contname }}"
     Port "5432"
     User "postgres"
@@ -75,7 +75,7 @@ echo "SELECT datname FROM pg_database WHERE datistemplate = false;" | psql -h {{
 
 cat <<EOF >> $OUTPUT
   <Database $database>
-    Instance "{{ $service }}.{{ $stack }}"
+    Instance "{{ $service }}.{{ $stack }}_$database"
     Host "{{ $service }}.{{ $stack }}"
     Port "5432"
     User "{{ getv $user }}"
