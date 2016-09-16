@@ -10,12 +10,23 @@ echo '<Plugin "postgresql">' > $OUTPUT
   {{ $label := printf "/containers/%s/labels/com.camptocamp.monitoring.postgres" $contname -}}
   {{ $monitor := getv $label "false" -}}
   {{ if eq $monitor "true" }}
+    {{ $stack_name := printf "/containers/%s/stack_name" $contname -}}
+    {{ $service_name := printf "/containers/%s/service_name" $contname -}}
+    {{ $stack := getv $stack_name -}}
+    {{ $service := getv $service_name -}}
+    {{ $user_path := printf "/stacks/%s/services/%s/metadata/credentials/user" $stack $service }}
+    {{ $password_path := printf "/stacks/%s/services/%s/metadata/credentials/password" $stack $service }}
+    {{ $user := getv $user_path "postgres" -}}
+
 cat <<EOF >> $OUTPUT
   <Database template1>
     Instance "{{ $contname }}"
     Host "{{ $contname }}"
     Port "5432"
-    User "postgres"
+    User "{{ $user }}"
+    {{ if $password_path -}}
+    Password "{{ getv $password_path }}"
+    {{ end }}
     Query replication_lag
     Query xlog_position
   </Database>
@@ -29,7 +40,10 @@ cat <<EOF >> $OUTPUT
     Instance "{{ $contname }}_$database"
     Host "{{ $contname }}"
     Port "5432"
-    User "postgres"
+    User "{{ $user }}"
+    {{ if $password_path -}}
+    Password "{{ getv $password_path }}"
+    {{ end }}
     Query backends
     Query transactions
     Query queries
