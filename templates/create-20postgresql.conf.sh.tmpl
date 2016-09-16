@@ -24,7 +24,7 @@ cat <<EOF >> $OUTPUT
     Host "{{ $contname }}"
     Port "5432"
     User "{{ $user }}"
-    {{ if $password_path -}}
+    {{ if exists $password_path -}}
     Password "{{ getv $password_path }}"
     {{ end }}
     Query replication_lag
@@ -41,7 +41,7 @@ cat <<EOF >> $OUTPUT
     Host "{{ $contname }}"
     Port "5432"
     User "{{ $user }}"
-    {{ if $password_path -}}
+    {{ if exists $password_path -}}
     Password "{{ getv $password_path }}"
     {{ end }}
     Query backends
