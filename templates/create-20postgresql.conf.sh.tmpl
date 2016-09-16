@@ -33,7 +33,10 @@ cat <<EOF >> $OUTPUT
 
 EOF
 
-echo "SELECT datname FROM pg_database WHERE datistemplate = false;" | psql -h {{ $contname }} -At -Upostgres | grep -v postgres | while read database; do
+{{ if exists $password_path -}}
+export PGPASSWORD="{{ getv $password_path }}"
+{{ end }}
+echo "SELECT datname FROM pg_database WHERE datistemplate = false;" | psql -h {{ $service }}.{{ $stack }} -At -U{{ $user }} | grep -v postgres | while read database; do
 
 cat <<EOF >> $OUTPUT
   <Database $database>
@@ -69,31 +72,38 @@ done
     {{ $label := printf "/stacks/%s/services/%s/labels/com.camptocamp.monitoring.postgres" $stack $service -}}
     {{ $monitor := getv $label "false" -}}
     {{ if eq $monitor "true" }}
-      {{ $user := printf "/stacks/%s/services/%s/metadata/credentials/user" $stack $service }}
-      {{ $password := printf "/stacks/%s/services/%s/metadata/credentials/password" $stack $service }}
+      {{ $user_path := printf "/stacks/%s/services/%s/metadata/credentials/user" $stack $service }}
+      {{ $password_path := printf "/stacks/%s/services/%s/metadata/credentials/password" $stack $service }}
+      {{ $user := getv $user_path "postgres" -}}
 cat <<EOF >> $OUTPUT
   <Database template1>
     Instance "{{ $service }}.{{ $stack }}"
     Host "{{ $service }}.{{ $stack }}"
     Port "5432"
-    User "{{ getv $user }}"
-    Password "{{ getv $password }}"
+    User "{{ $user }}"
+    {{ if exists $password_path -}}
+    Password "{{ getv $password_path }}"
+    {{ end -}}
     Query replication_lag
     Query xlog_position
   </Database>
 
 EOF
 
-export PGPASSWORD="{{ getv $password }}"
-echo "SELECT datname FROM pg_database WHERE datistemplate = false;" | psql -h {{ $service }}.{{ $stack }} -At -U{{ getv $user }} | grep -v postgres | while read database; do
+{{ if exists $password_path -}}
+export PGPASSWORD="{{ getv $password_path }}"
+{{ end -}}
+echo "SELECT datname FROM pg_database WHERE datistemplate = false;" | psql -h {{ $service }}.{{ $stack }} -At -U{{ $user }} | grep -v postgres | while read database; do
 
 cat <<EOF >> $OUTPUT
   <Database $database>
     Instance "{{ $service }}.{{ $stack }}_$database"
     Host "{{ $service }}.{{ $stack }}"
     Port "5432"
-    User "{{ getv $user }}"
-    Password "{{ getv $password }}"
+    User "{{ $user }}"
+    {{ if exists $password_path -}}
+    Password "{{ getv $password_path }}"
+    {{ end -}}
     Query backends
     Query transactions
     Query queries
