@@ -1,9 +1,9 @@
 [template]
-src = "create-20postgresql-replication.conf.sh.tmpl"
-dest = "/create-20postgresql-replication.conf.sh"
+src = "create-20postgresql.conf.sh.tmpl"
+dest = "/create-20postgresql.conf.sh"
 keys = [
   "/containers",
   "/stacks",
 ]
 
-reload_cmd = "sh /create-20postgresql-replication.conf.sh && /usr/bin/sv force-reload collectd"
+reload_cmd = "sh /create-20postgresql.conf.sh && /usr/bin/sv force-reload collectd"
