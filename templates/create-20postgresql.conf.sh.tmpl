@@ -19,7 +19,7 @@ echo '<Plugin "postgresql">' > $OUTPUT
     {{ $user := getv $user_path "postgres" -}}
 
 cat <<EOF >> $OUTPUT
-  <Database template1>
+  <Database postgres>
     Instance "{{ $contname }}"
     Host "{{ $contname }}"
     Port "5432"
@@ -28,7 +28,9 @@ cat <<EOF >> $OUTPUT
     Password "{{ getv $password_path }}"
     {{ end }}
     Query replication_lag
-    Query xlog_position
+    Query replication_write_lag
+    Query replication_flush_lag
+    Query replication_replay_lag
     Query settings
   </Database>
 
@@ -77,7 +79,7 @@ done
       {{ $password_path := printf "/stacks/%s/services/%s/metadata/credentials/password" $stack $service }}
       {{ $user := getv $user_path "postgres" -}}
 cat <<EOF >> $OUTPUT
-  <Database template1>
+  <Database postgres>
     Instance "{{ $service }}.{{ $stack }}"
     Host "{{ $service }}.{{ $stack }}"
     Port "5432"
@@ -86,7 +88,9 @@ cat <<EOF >> $OUTPUT
     Password "{{ getv $password_path }}"
     {{ end -}}
     Query replication_lag
-    Query xlog_position
+    Query replication_write_lag
+    Query replication_flush_lag
+    Query replication_replay_lag
     Query settings
   </Database>
 
