@@ -31,6 +31,9 @@ cat <<EOF >> $OUTPUT
     Query replication_write_lag
     Query replication_flush_lag
     Query replication_replay_lag
+    Query current_xlog_location
+    Query last_xlog_receive_location
+    Query last_xlog_replay_location
     Query settings
   </Database>
 
@@ -91,6 +94,9 @@ cat <<EOF >> $OUTPUT
     Query replication_write_lag
     Query replication_flush_lag
     Query replication_replay_lag
+    Query current_xlog_location
+    Query last_xlog_receive_location
+    Query last_xlog_replay_location
     Query settings
   </Database>
 
