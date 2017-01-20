@@ -6,4 +6,4 @@ keys = [
   "/stacks",
 ]
 
-reload_cmd = "sh /create-20postgresql.conf.sh && /usr/bin/sv force-reload collectd"
+reload_cmd = "sh /create-20postgresql.conf.sh && /usr/bin/sv force-restart collectd"

@@ -9,4 +9,4 @@ while true; do
 done
 
 sh /create-20postgresql.conf.sh
-chpst -e /etc/service/collectd/env /usr/sbin/collectd -f
+exec chpst -e /etc/service/collectd/env /usr/sbin/collectd -f
