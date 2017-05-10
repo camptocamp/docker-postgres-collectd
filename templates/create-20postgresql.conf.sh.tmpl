@@ -3,6 +3,26 @@
 OUTPUT=/etc/collectd/collectd.conf.d/20postgresql.conf
 DBLIST_QUERY="SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true AND datname NOT IN ('postgres', 'rdsadmin');"
 
+PGFCT_QUERY="$(cat << EOF
+CREATE OR REPLACE FUNCTION pg_lsn_to_bytes(lsn pg_lsn)
+        RETURNS bigint AS
+    \$\$
+    DECLARE
+        offset1 text;
+        xlog1 text;
+        result bigint;
+    BEGIN
+        xlog1=split_part(\$1::text,'/',1);
+        offset1=split_part(\$1::text,'/',2);
+        EXECUTE 'SELECT (x'''||'FF000000'||'''::bigint * x'''||xlog1||'''::bigint
+                                  + x'''||offset1||'''::bigint)' INTO result;
+        RETURN result;
+    END;
+    \$\$
+    LANGUAGE plpgsql IMMUTABLE STRICT;
+EOF
+)"
+
 echo '<Plugin "postgresql">' > $OUTPUT
 
 {{ $containers := getvs "/containers/*/name" -}}
@@ -41,10 +61,15 @@ cat <<EOF >> $OUTPUT
 
 EOF
 
+export PGHOST="{{ $service }}.{{ $stack }}"
+export PGUSER="{{ $user }}"
+export PGDATABASE="template1"
 {{ if exists $password_path -}}
 export PGPASSWORD="{{ getv $password_path }}"
-{{ end }}
-echo $DBLIST_QUERY | psql -h {{ $service }}.{{ $stack }} -At -U{{ $user }} -d template1 | while read database; do
+{{ end -}}
+
+echo "$PGFCT_QUERY"  | psql
+echo "$DBLIST_QUERY" | psql -At | while read database; do
 
 cat <<EOF >> $OUTPUT
   <Database $database>
@@ -105,10 +130,15 @@ cat <<EOF >> $OUTPUT
 
 EOF
 
+export PGHOST="{{ $service }}.{{ $stack }}"
+export PGUSER="{{ $user }}"
+export PGDATABASE="template1"
 {{ if exists $password_path -}}
 export PGPASSWORD="{{ getv $password_path }}"
 {{ end -}}
-echo $DBLIST_QUERY | psql -h {{ $service }}.{{ $stack }} -At -U{{ $user }} -d template1 | while read database; do
+
+echo "$PGFCT_QUERY"  | psql
+echo "$DBLIST_QUERY" | psql -At | while read database; do
 
 cat <<EOF >> $OUTPUT
   <Database $database>
