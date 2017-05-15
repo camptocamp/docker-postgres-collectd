@@ -8,5 +8,5 @@ while true; do
   sleep 1
 done
 
-sh /create-20postgresql.conf.sh
+sh -x /create-20postgresql.conf.sh
 exec chpst -e /etc/service/collectd/env /usr/sbin/collectd -f
