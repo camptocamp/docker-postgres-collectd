@@ -108,6 +108,67 @@ done
       {{ $user_path := printf "/stacks/%s/services/%s/metadata/credentials/user" $stack $service }}
       {{ $password_path := printf "/stacks/%s/services/%s/metadata/credentials/password" $stack $service }}
       {{ $user := getv $user_path "postgres" -}}
+
+      {{ if eq "null" (getv (printf "/stacks/%s/services/%s/hostname" $stack $service)) -}}
+        {{ range $external_ip := ls (printf "/stacks/%s/services/%s/external_ips" $stack $service) -}}
+          {{ if (not (eq "stacks" $external_ip)) -}}
+            {{ $hostname := getv (printf "/stacks/%s/services/%s/external_ips/%s" $stack $service $external_ip) -}}
+cat <<EOF >> $OUTPUT
+  <Database postgres>
+    Instance "{{ $hostname }}"
+    Host "{{ $hostname }}"
+    Port "5432"
+    User "{{ $user }}"
+    {{ if exists $password_path -}}
+    Password "{{ getv $password_path }}"
+    {{ end -}}
+    Query replication_lag
+    Query replication_write_lag
+    Query replication_flush_lag
+    Query replication_replay_lag
+    Query replication_slots
+    Query current_xlog_location
+    Query last_xlog_receive_location
+    Query last_xlog_replay_location
+    Query settings
+  </Database>
+
+EOF
+
+export PGHOST="{{ $hostname }}"
+export PGUSER="{{ $user }}"
+export PGDATABASE="template1"
+{{ if exists $password_path -}}
+export PGPASSWORD="{{ getv $password_path }}"
+{{ end -}}
+
+echo "$PGFCT_QUERY"  | psql
+echo "$DBLIST_QUERY" | psql -At | while read database; do
+
+cat <<EOF >> $OUTPUT
+  <Database $database>
+    Instance "{{ $hostname }}_$database"
+    Host "{{ $hostname }}"
+    Port "5432"
+    User "{{ $user }}"
+    {{ if exists $password_path -}}
+    Password "{{ getv $password_path }}"
+    {{ end -}}
+    Query backends
+    Query transactions
+    Query queries
+    Query query_plans
+    Query table_states
+    Query disk_io
+    Query disk_usage
+  </Database>
+
+EOF
+
+done
+            {{ end -}}
+          {{ end -}}
+        {{ else -}}
 cat <<EOF >> $OUTPUT
   <Database postgres>
     Instance "{{ $service }}.{{ $stack }}"
@@ -161,6 +222,7 @@ cat <<EOF >> $OUTPUT
 EOF
 
 done
+        {{ end -}}
       {{ end -}}
     {{ end -}}
   {{ end -}}
