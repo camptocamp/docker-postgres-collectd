@@ -13,4 +13,5 @@ ADD ./templates /etc/confd/templates
 ADD ./confd.run /etc/service/confd/run
 ADD ./collectd.run /etc/service/collectd/run
 
+RUN echo "collectd_postgresql" > /etc/service/collectd/env/PGAPPNAME
 COPY /config/*.conf /etc/collectd/collectd.conf.d/
