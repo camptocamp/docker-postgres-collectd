@@ -2,6 +2,7 @@ FROM camptocamp/collectd:v5.8.0-20180504
 
 RUN apt-get update \
  && apt-get -y upgrade \
+ && mkdir -p /usr/share/man/man1 /usr/share/man/man7 \
  && apt-get -y --no-install-suggests --no-install-recommends install \
     libpq5 \
     postgresql-client \
