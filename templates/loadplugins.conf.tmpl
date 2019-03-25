@@ -1,4 +1,4 @@
-{{ if eq "true" (getv "/self/host/labels/monitoring" getv "false") -}}
+{{ if eq "true" (getv "/self/host/labels/monitoring" "false") -}}
 LoadPlugin postgresql
 {{ else -}}
 LoadPlugin filecount
