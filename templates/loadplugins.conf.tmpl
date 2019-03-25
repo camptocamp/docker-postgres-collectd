@@ -1,0 +1,5 @@
+{{ if eq "true" (getv "/self/host/labels/monitoring" getv "false") -}}
+LoadPlugin postgresql
+{{ else -}}
+LoadPlugin filecount
+{{ end -}}

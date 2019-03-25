@@ -1,0 +1,8 @@
+[template]
+src = "loadplugins.conf.tmpl"
+dest = "/etc/collectd/collectd.conf.d/02loadplugins.conf"
+keys = [
+  "/self",
+]
+
+reload_cmd = "/usr/bin/sv force-restart collectd"
